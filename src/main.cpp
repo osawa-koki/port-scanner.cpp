@@ -57,7 +57,15 @@ int main()
     addr.sin_family = AF_INET;
     addr.sin_port = htons(port);
     addr.sin_addr = reinterpret_cast<sockaddr_in*>(res->ai_addr)->sin_addr;
-    if (connect(sock, reinterpret_cast<sockaddr*>(&addr), sizeof(addr)) == 0) {
+    if (connect(sock, reinterpret_cast<sockaddr*>(&addr), sizeof(addr)) == -1) {
+      if (errno == ETIMEDOUT) {
+        // 接続待ち時間を超えて接続が成功しなかった場合
+        std::cout << "Port " << port << ": Connection timeout" << std::endl;
+      } else {
+        // その他のエラー
+        std::cout << "Port " << port << ": Connection error" << std::endl;
+      }
+    } else {
       // 接続成功
       std::cout << "Port " << port << ": Open" << std::endl;
     }
