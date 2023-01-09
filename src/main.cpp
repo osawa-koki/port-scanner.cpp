@@ -3,6 +3,7 @@
 #include <unistd.h>
 #include <netdb.h>
 #include <arpa/inet.h>
+#include <omp.h>
 
 const char* HOSTNAME = "example.com";
 const unsigned short PORT_START = 50;
@@ -31,11 +32,22 @@ int main()
   }
 
   // 各ポートに対して接続を試みる
+  #pragma omp parallel for
   for (unsigned short port = PORT_START; port <= PORT_END; ++port) {
+    std::cout << "Port " << port << ": Scanning..." << std::endl;
     // ソケットを作成する
     int sock = socket(AF_INET, SOCK_STREAM, 0);
     if (sock < 0) {
       std::cerr << "Error: Failed to create socket" << std::endl;
+      continue;
+    }
+
+    // タイムアウトの設定
+    timeval timeout;
+    timeout.tv_sec = 1;
+    timeout.tv_usec = 0;
+    if (setsockopt(sock, SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof(timeout)) < 0) {
+      std::cerr << "Error: Failed to set timeout" << std::endl;
       continue;
     }
 

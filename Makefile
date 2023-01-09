@@ -3,7 +3,7 @@ SOURCES = src/main.cpp
 OBJECTS = $(SOURCES:.cpp=.o)
 EXECUTABLE = main
 BUILD_DIR = build
-LDFLAGS = -lstdc++
+LDFLAGS = -lstdc++ -fopenmp
 
 all: $(BUILD_DIR) $(EXECUTABLE)
 
